@@ -288,7 +288,7 @@ def get_kommunen_to_scan():
 class RISScraper(ABC):
     """Abstrakte Basisklasse fuer alle RIS-Scraper."""
 
-    def __init__(self, config: KommuneConfig, keywords: list, days: int = 7):
+    def __init__(self, config: KommuneConfig, keywords: list, days: int = 30):
         self.config = config
         self.keywords = [kw.lower() for kw in keywords]
         self.days = days
