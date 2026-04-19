@@ -1,0 +1,66 @@
+{
+    "_INFO": "=== RIS-Monitor Konfiguration ===",
+    "_ANLEITUNG_KEYWORDS": "Schlagwoerter unten aendern: Woerter hinzufuegen, aendern oder loeschen.",
+    "_ANLEITUNG_KOMMUNEN": "Neue Kommunen unter 'extra_kommunen' hinzufuegen. 'system' ist meist 'allris'. Die base_url findet man auf der Ratsinformations-Webseite der Kommune.",
+    "keywords": [
+        "Bebauungsplan",
+        "B-Plan",
+        "Bauleitplanung",
+        "Flaechennutzungsplan",
+        "Bauvorhaben",
+        "Baugenehmigung",
+        "Aufstellungsbeschluss",
+        "Satzungsbeschluss",
+        "Strassenbau",
+        "Radweg",
+        "Verkehrsplanung",
+        "Kita",
+        "Kindertagesstaette",
+        "Schule",
+        "Schulbau",
+        "Klimaschutz",
+        "Photovoltaik",
+        "Windkraft",
+        "Nachhaltigkeit",
+        "Haushalt",
+        "Haushaltsplan",
+        "Nachtragshaushalt",
+        "Grundsteuer",
+        "Gewerbesteuer",
+        "Gewerbegebiet",
+        "Ansiedlung",
+        "Wirtschaftsfoerderung",
+        "Flughafen",
+        "BER",
+        "Wohnen",
+        "Sozialwohnung",
+        "Breitband",
+        "Glasfaser",
+        "Digitalisierung"
+    ],
+    "extra_kommunen": [
+        {
+            "_beispiel": "So fuegt man eine neue Kommune hinzu:",
+            "key": "potsdam_beispiel",
+            "name": "Landeshauptstadt Potsdam",
+            "system": "allris",
+            "base_url": "https://egov.potsdam.de/bi",
+            "oparl_url": "",
+            "notes": "Beispiel - bitte aktivieren indem der Key unten in kommunen_aktiv eingetragen wird"
+        }
+    ],
+    "kommunen_aktiv": [],
+    "_HINWEIS_KOMMUNEN_AKTIV": "Leer = ALLE Kommunen werden gescannt (inkl. extra_kommunen). Hier einzelne Keys eintragen um nur bestimmte zu scannen, z.B.: [\"schoenefeld\", \"berlin_mitte\", \"leipzig\"]",
+    "email": {
+        "enabled": false,
+        "smtp_host": "smtp.example.com",
+        "smtp_port": 587,
+        "smtp_user": "",
+        "smtp_pass": "",
+        "from_addr": "ris@example.com",
+        "to_addrs": [
+            "team@example.com"
+        ],
+        "subject_prefix": "[RIS-Monitor]"
+    }
+}

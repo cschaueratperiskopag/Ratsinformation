@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RIS-Monitor Einstellungen</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f5f7fa;color:#333;padding:1.5em}
+.c{max-width:900px;margin:0 auto}
+h1{color:#1a365d;margin-bottom:.2em;font-size:1.6em}
+.sub{color:#666;margin-bottom:1.5em;font-size:.95em}
+.nav{margin-bottom:1.5em}
+.nav a{color:#2b6cb0;text-decoration:none;margin-right:1.5em;font-weight:600}
+.nav a:hover{text-decoration:underline}
+.card{background:#fff;border-radius:10px;padding:1.5em 2em;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:1.5em}
+.card h2{color:#2b6cb0;margin-bottom:.3em;font-size:1.15em}
+.card .desc{color:#888;font-size:.85em;margin-bottom:1em}
+.setup-card{border:2px solid #ed8936;background:#fffaf0}
+.setup-card h2{color:#c05621}
+
+/* Tags */
+.tags{display:flex;flex-wrap:wrap;gap:.4em;margin-bottom:.8em;min-height:2.5em;padding:.5em;border:1px solid #e2e8f0;border-radius:6px;background:#f7fafc}
+.tag{display:inline-flex;align-items:center;background:#ebf4ff;color:#2b6cb0;padding:.3em .7em;border-radius:5px;font-size:.88em}
+.tag .x{margin-left:.5em;cursor:pointer;color:#e53e3e;font-weight:700;font-size:1em}
+.tag .x:hover{color:#c53030}
+.add-row{display:flex;gap:.5em;margin-bottom:.3em}
+.add-row input{flex:1;padding:.5em .8em;border:1px solid #cbd5e0;border-radius:6px;font-size:.9em}
+.add-row input:focus{outline:none;border-color:#2b6cb0}
+
+/* Kommune form */
+.kommune-item{background:#f7fafc;border:1px solid #e2e8f0;border-radius:8px;padding:1em;margin-bottom:.6em;display:flex;align-items:center;justify-content:space-between}
+.kommune-item .info{flex:1}
+.kommune-item .info strong{color:#1a365d}
+.kommune-item .info small{color:#888;display:block;margin-top:.2em;word-break:break-all}
+.kommune-item .remove{color:#e53e3e;cursor:pointer;font-size:1.3em;padding:.3em;font-weight:700}
+.kommune-item .remove:hover{color:#c53030}
+.kommune-form{display:grid;grid-template-columns:1fr 1fr;gap:.5em;margin-top:.5em}
+.kommune-form.full{grid-template-columns:1fr}
+.kommune-form input,.kommune-form select{padding:.5em .8em;border:1px solid #cbd5e0;border-radius:6px;font-size:.9em}
+.kommune-form input:focus,.kommune-form select:focus{outline:none;border-color:#2b6cb0}
+
+/* Buttons */
+.btn{padding:.6em 1.4em;border:none;border-radius:6px;font-size:.95em;cursor:pointer;font-weight:600}
+.btn-blue{background:#2b6cb0;color:#fff}.btn-blue:hover{background:#1a4e8a}
+.btn-green{background:#38a169;color:#fff}.btn-green:hover{background:#2f855a}
+.btn-gray{background:#e2e8f0;color:#333}.btn-gray:hover{background:#cbd5e0}
+.btn-sm{padding:.35em .8em;font-size:.85em}
+
+/* Status messages */
+.msg{padding:.8em 1em;border-radius:6px;margin-bottom:1em;display:none;font-size:.9em}
+.msg-ok{background:#c6f6d5;color:#22543d;display:block}
+.msg-err{background:#fed7d7;color:#822727;display:block}
+.msg-info{background:#bee3f8;color:#2a4365;display:block}
+
+/* Setup */
+.setup-form{margin-top:.8em}
+.setup-form label{font-size:.9em;font-weight:600;display:block;margin-bottom:.3em;color:#555}
+.setup-form input{width:100%;padding:.5em .8em;border:1px solid #cbd5e0;border-radius:6px;font-size:.9em;margin-bottom:.8em}
+.help{font-size:.8em;color:#888;margin-top:-.5em;margin-bottom:.8em}
+
+.spinner{display:inline-block;width:1em;height:1em;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-left:.5em}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="c">
+<h1>RIS-Monitor Einstellungen</h1>
+<p class="sub">Schlagwoerter und Kommunen direkt hier anpassen</p>
+
+<div class="nav">
+  <a href="index.html">&larr; Zurueck zum Dashboard</a>
+  <a href="#keywords">Schlagwoerter</a>
+  <a href="#kommunen">Kommunen</a>
+</div>
+
+<div id="msg" class="msg"></div>
+
+<!-- Setup -->
+<div id="setup-section" class="card setup-card">
+  <h2>Ersteinrichtung (einmalig)</h2>
+  <p class="desc">Damit die Einstellungen gespeichert werden koennen, braucht die Seite Zugriff auf euer GitHub-Repository.</p>
+  <div class="setup-form">
+    <label>GitHub Benutzername</label>
+    <input type="text" id="gh-owner" placeholder="z.B. meinname">
+
+    <label>Repository-Name</label>
+    <input type="text" id="gh-repo" value="ris-monitor" placeholder="z.B. ris-monitor">
+
+    <label>Personal Access Token</label>
+    <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx">
+    <p class="help">
+      Erstellen unter: github.com &rarr; Settings &rarr; Developer settings &rarr; Personal access tokens &rarr; Tokens (classic) &rarr; Generate new token.<br>
+      Berechtigung: nur <strong>"repo"</strong> ankreuzen. Token wird nur lokal in deinem Browser gespeichert.
+    </p>
+
+    <button class="btn btn-blue" onclick="saveSetup()">Verbindung speichern &amp; Konfiguration laden</button>
+  </div>
+</div>
+
+<!-- Keywords -->
+<div id="keywords" class="card hidden">
+  <h2>Schlagwoerter</h2>
+  <p class="desc">Nach diesen Begriffen werden die Ratsinformationssysteme durchsucht. Klicke das X zum Entfernen, oder fuege unten neue hinzu.</p>
+  <div id="keyword-tags" class="tags"></div>
+  <div class="add-row">
+    <input type="text" id="new-keyword" placeholder="Neues Schlagwort eingeben..." onkeydown="if(event.key==='Enter')addKeyword()">
+    <button class="btn btn-gray btn-sm" onclick="addKeyword()">+ Hinzufuegen</button>
+  </div>
+</div>
+
+<!-- Kommunen -->
+<div id="kommunen" class="card hidden">
+  <h2>Kommunen</h2>
+  <p class="desc">Diese Kommunen werden gescannt. Bestehende entfernen oder neue hinzufuegen.</p>
+  <div id="kommune-list"></div>
+
+  <details style="margin-top:1em">
+    <summary style="cursor:pointer;color:#2b6cb0;font-weight:600">+ Neue Kommune hinzufuegen</summary>
+    <div class="kommune-form" style="margin-top:.8em">
+      <div>
+        <input type="text" id="new-k-name" placeholder="Name (z.B. Landeshauptstadt Potsdam)">
+      </div>
+      <div>
+        <input type="text" id="new-k-key" placeholder="Schluessel (z.B. potsdam, keine Leerzeichen)">
+      </div>
+    </div>
+    <div class="kommune-form full" style="margin-top:.5em">
+      <input type="text" id="new-k-url" placeholder="URL des Ratsinformationssystems (z.B. https://egov.potsdam.de/bi)">
+    </div>
+    <div class="kommune-form" style="margin-top:.5em">
+      <select id="new-k-system">
+        <option value="allris">ALLRIS (Standard, die meisten Kommunen)</option>
+        <option value="oparl">OParl-API</option>
+        <option value="ris_muenchen">RIS Muenchen</option>
+      </select>
+      <button class="btn btn-gray btn-sm" onclick="addKommune()">+ Kommune hinzufuegen</button>
+    </div>
+    <p class="help" style="margin-top:.5em">
+      URL finden: Googeln "[Stadtname] Ratsinformationssystem" oder "[Stadtname] Buergerinfo".<br>
+      System: Im Zweifel "ALLRIS" waehlen – das nutzen die meisten Kommunen.
+    </p>
+  </details>
+</div>
+
+<!-- Save -->
+<div id="save-section" class="hidden" style="text-align:center;margin:1.5em 0">
+  <button class="btn btn-green" onclick="saveConfig()" id="save-btn" style="font-size:1.1em;padding:.8em 2.5em">
+    Einstellungen speichern
+  </button>
+  <p style="color:#888;font-size:.8em;margin-top:.5em">Aenderungen werden auf GitHub gespeichert und beim naechsten Scan verwendet.</p>
+</div>
+
+</div>
+
+<script>
+// State
+let config = {};
+let ghSettings = {};
+let configSha = "";
+
+// --- Setup ---
+function loadSetup() {
+    const saved = localStorage.getItem("ris_monitor_gh");
+    if (saved) {
+        ghSettings = JSON.parse(saved);
+        document.getElementById("gh-owner").value = ghSettings.owner || "";
+        document.getElementById("gh-repo").value = ghSettings.repo || "";
+        document.getElementById("gh-token").value = ghSettings.token || "";
+        if (ghSettings.owner && ghSettings.token) {
+            loadConfig();
+        }
+    }
+}
+
+function saveSetup() {
+    ghSettings = {
+        owner: document.getElementById("gh-owner").value.trim(),
+        repo: document.getElementById("gh-repo").value.trim() || "ris-monitor",
+        token: document.getElementById("gh-token").value.trim()
+    };
+    if (!ghSettings.owner || !ghSettings.token) {
+        showMsg("Bitte Benutzername und Token eingeben.", "err");
+        return;
+    }
+    localStorage.setItem("ris_monitor_gh", JSON.stringify(ghSettings));
+    loadConfig();
+}
+
+// --- GitHub API ---
+async function ghFetch(path, options = {}) {
+    const url = `https://api.github.com/repos/${ghSettings.owner}/${ghSettings.repo}/contents/${path}`;
+    const resp = await fetch(url, {
+        ...options,
+        headers: {
+            "Authorization": `Bearer ${ghSettings.token}`,
+            "Accept": "application/vnd.github.v3+json",
+            ...(options.headers || {})
+        }
+    });
+    return resp;
+}
+
+async function loadConfig() {
+    showMsg("Lade Konfiguration...", "info");
+    try {
+        const resp = await ghFetch("config.json");
+        if (!resp.ok) throw new Error("config.json nicht gefunden (Status " + resp.status + ")");
+        const data = await resp.json();
+        configSha = data.sha;
+        const content = atob(data.content.replace(/\n/g, ""));
+        config = JSON.parse(content);
+        showMsg("Konfiguration geladen!", "ok");
+        document.getElementById("setup-section").style.display = "none";
+        document.getElementById("keywords").classList.remove("hidden");
+        document.getElementById("kommunen").classList.remove("hidden");
+        document.getElementById("save-section").classList.remove("hidden");
+        renderKeywords();
+        renderKommunen();
+    } catch (e) {
+        showMsg("Fehler: " + e.message, "err");
+    }
+}
+
+async function saveConfig() {
+    const btn = document.getElementById("save-btn");
+    btn.innerHTML = 'Speichern... <span class="spinner"></span>';
+    btn.disabled = true;
+    try {
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(config, null, 4))));
+        const resp = await ghFetch("config.json", {
+            method: "PUT",
+            body: JSON.stringify({
+                message: "Einstellungen aktualisiert via Dashboard",
+                content: content,
+                sha: configSha
+            })
+        });
+        if (!resp.ok) {
+            const err = await resp.json();
+            throw new Error(err.message || "Speichern fehlgeschlagen");
+        }
+        const data = await resp.json();
+        configSha = data.content.sha;
+        showMsg("Gespeichert! Aenderungen werden beim naechsten Scan (Mo/Mi) aktiv. Oder starte jetzt einen manuellen Scan im Actions-Tab.", "ok");
+    } catch(e) {
+        showMsg("Fehler beim Speichern: " + e.message, "err");
+    }
+    btn.innerHTML = "Einstellungen speichern";
+    btn.disabled = false;
+}
+
+// --- Keywords UI ---
+function renderKeywords() {
+    const container = document.getElementById("keyword-tags");
+    container.innerHTML = "";
+    (config.keywords || []).forEach((kw, i) => {
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.innerHTML = kw + ' <span class="x" onclick="removeKeyword(' + i + ')">&times;</span>';
+        container.appendChild(tag);
+    });
+}
+
+function addKeyword() {
+    const input = document.getElementById("new-keyword");
+    const val = input.value.trim();
+    if (!val) return;
+    if (!config.keywords) config.keywords = [];
+    if (!config.keywords.includes(val)) {
+        config.keywords.push(val);
+        renderKeywords();
+    }
+    input.value = "";
+    input.focus();
+}
+
+function removeKeyword(i) {
+    config.keywords.splice(i, 1);
+    renderKeywords();
+}
+
+// --- Kommunen UI ---
+function renderKommunen() {
+    const container = document.getElementById("kommune-list");
+    container.innerHTML = "";
+    (config.extra_kommunen || []).forEach((k, i) => {
+        const div = document.createElement("div");
+        div.className = "kommune-item";
+        div.innerHTML = `
+            <div class="info">
+                <strong>${k.name || k.key}</strong>
+                <small>${k.base_url || ""} (${k.system || "allris"})</small>
+            </div>
+            <span class="remove" onclick="removeKommune(${i})" title="Entfernen">&times;</span>
+        `;
+        container.appendChild(div);
+    });
+
+    // Show built-in kommunen as non-removable
+    const builtIn = [
+        ["Gemeinde Schoenefeld","schoenefeld"], ["Gemeinde Wandlitz","wandlitz"],
+        ["Stadt Koenigs Wusterhausen","koenigs_wusterhausen"],
+        ["Berlin Mitte","berlin_mitte"], ["Berlin Friedrichshain-Kreuzberg","berlin_friedrichshain_kreuzberg"],
+        ["Berlin Pankow","berlin_pankow"], ["Berlin Charlottenburg-Wilmersdorf","berlin_charlottenburg_wilmersdorf"],
+        ["Berlin Spandau","berlin_spandau"], ["Berlin Steglitz-Zehlendorf","berlin_steglitz_zehlendorf"],
+        ["Berlin Tempelhof-Schoeneberg","berlin_tempelhof_schoeneberg"],
+        ["Berlin Neukoelln","berlin_neukoelln"], ["Berlin Treptow-Koepenick","berlin_treptow_koepenick"],
+        ["Berlin Marzahn-Hellersdorf","berlin_marzahn_hellersdorf"],
+        ["Berlin Lichtenberg","berlin_lichtenberg"], ["Berlin Reinickendorf","berlin_reinickendorf"],
+        ["Magdeburg","magdeburg"], ["Bad Vilbel","bad_vilbel"],
+        ["Leipzig","leipzig"], ["Muenchen","muenchen"],
+        ["Fuerstenfeldbruck","fuerstenfeldbruck"], ["Lenningen","lenningen"]
+    ];
+    builtIn.forEach(([name, key]) => {
+        const div = document.createElement("div");
+        div.className = "kommune-item";
+        div.style.opacity = ".7";
+        div.innerHTML = `<div class="info"><strong>${name}</strong><small>Schluessel: ${key} (fest eingebaut)</small></div>`;
+        container.appendChild(div);
+    });
+}
+
+function addKommune() {
+    const name = document.getElementById("new-k-name").value.trim();
+    const key = document.getElementById("new-k-key").value.trim().toLowerCase().replace(/[^a-z0-9_]/g,"_");
+    const url = document.getElementById("new-k-url").value.trim();
+    const system = document.getElementById("new-k-system").value;
+    if (!name || !key || !url) {
+        showMsg("Bitte Name, Schluessel und URL ausfuellen.", "err");
+        return;
+    }
+    if (!config.extra_kommunen) config.extra_kommunen = [];
+    config.extra_kommunen.push({key, name, system, base_url: url, oparl_url: "", notes: ""});
+    renderKommunen();
+    document.getElementById("new-k-name").value = "";
+    document.getElementById("new-k-key").value = "";
+    document.getElementById("new-k-url").value = "";
+    showMsg(name + " hinzugefuegt! Vergiss nicht unten zu speichern.", "ok");
+}
+
+function removeKommune(i) {
+    config.extra_kommunen.splice(i, 1);
+    renderKommunen();
+}
+
+// --- Messages ---
+function showMsg(text, type) {
+    const el = document.getElementById("msg");
+    el.className = "msg msg-" + type;
+    el.textContent = text;
+    if (type === "ok") setTimeout(() => { el.style.display = "none"; }, 8000);
+}
+
+// Init
+loadSetup();
+</script>
+</body>
+</html>
