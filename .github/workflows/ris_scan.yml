@@ -25,7 +25,7 @@ jobs:
         run: |
           mkdir -p docs/reports
           DATE=$(date +%Y-%m-%d)
-          python ris_monitor.py -d 4 -o docs/reports/bericht_${DATE}.html
+          python ris_monitor.py -d 30 -o docs/reports/bericht_${DATE}.html
           cp docs/reports/bericht_${DATE}.html docs/reports/latest.html
 
       - name: Index aktualisieren
