@@ -1,0 +1,40 @@
+name: RIS-Monitor Scan
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"   # Montag ~06-07 Uhr deutsche Zeit
+    - cron: "0 5 * * 3"   # Mittwoch ~06-07 Uhr deutsche Zeit
+  workflow_dispatch:       # Manueller Start jederzeit moeglich
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install -r requirements.txt
+
+      - name: RIS-Scan ausfuehren
+        run: |
+          mkdir -p docs/reports
+          DATE=$(date +%Y-%m-%d)
+          python ris_monitor.py -d 4 -o docs/reports/bericht_${DATE}.html
+          cp docs/reports/bericht_${DATE}.html docs/reports/latest.html
+
+      - name: Index aktualisieren
+        run: python generate_index.py
+
+      - name: Ergebnisse committen
+        run: |
+          git config user.name "RIS-Monitor Bot"
+          git config user.email "bot@ris-monitor"
+          git add docs/
+          git diff --cached --quiet || git commit -m "Scan $(date +%Y-%m-%d)"
+          git push
